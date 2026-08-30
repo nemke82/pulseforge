@@ -1,6 +1,6 @@
 # 🩺 PulseForge (GalaxyBP)
 
-**PulseForge** is an open-source health telemetry and Blood Pressure estimation suite designed specifically for **Samsung Galaxy Watch 4 / 5 / 6 / 7 (Wear OS)** and **Android / Samsung Smartphones**.
+**PulseForge** is an open-source health telemetry and Blood Pressure estimation suite designed specifically for **Samsung Galaxy Watch (Watch 4 / 5 / 6 / 7 / Ultra / Ultra 2 & FE on Wear OS)** and **Android / Samsung Smartphones**.
 
 It bypasses region and country restrictions of proprietary software by directly accessing raw sensor channels (**Optical PPG + ECG Electrodes + Heart Rate**) to compute **Pulse Transit Time (PTT)** and estimate systolic/diastolic blood pressure (**SYS / DIA**) calibrated against reference arm cuff measurements (e.g., Omron).
 
