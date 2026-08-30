@@ -392,6 +392,182 @@ fun HomeScreen(
 }
 
 @Composable
+fun MeasuringScreen(
+    countdown: Int,
+    heartRate: Int,
+    wavePoints: List<Float>,
+    onCancel: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            progress = (30 - countdown) / 30f,
+            modifier = Modifier.fillMaxSize(0.92f),
+            strokeWidth = 4.dp,
+            indicatorColor = Color(0xFF00E676),
+            trackColor = Color(0xFF1E293B)
+        )
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "${countdown}s",
+                color = Color(0xFF00E676),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = if (heartRate > 0) "$heartRate BPM" else "Detecting...",
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            WaveformCanvas(
+                points = wavePoints,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(28.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = onCancel,
+                modifier = Modifier
+                    .height(28.dp)
+                    .width(70.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF263238))
+            ) {
+                Text("Stop", color = Color(0xFFFF5252), fontSize = 10.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun WaveformCanvas(
+    points: List<Float>,
+    modifier: Modifier = Modifier
+) {
+    Canvas(modifier = modifier) {
+        if (points.size < 2) return@Canvas
+
+        val minV = points.minOrNull() ?: 0f
+        val maxV = points.maxOrNull() ?: 1f
+        val range = if (maxV - minV > 0.001f) maxV - minV else 1f
+
+        val stepX = size.width / (points.size - 1)
+        val path = Path()
+
+        points.forEachIndexed { index, value ->
+            val x = index * stepX
+            val normalizedY = (value - minV) / range
+            val y = size.height - (normalizedY * size.height)
+            if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
+        }
+
+        drawPath(
+            path = path,
+            color = Color(0xFF00E676),
+            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
+        )
+    }
+}
+
+@Composable
+fun ResultScreen(
+    result: BloodPressureMeasurement,
+    onDismiss: () -> Unit,
+    onRemeaure: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "BP ESTIMATE",
+            color = Color(0xFF8B949E),
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Row(
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = "${result.systolic}",
+                color = Color.White,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Black
+            )
+            Text(
+                text = "/",
+                color = Color(0xFF8B949E),
+                fontSize = 22.sp,
+                modifier = Modifier.padding(horizontal = 2.dp)
+            )
+            Text(
+                text = "${result.diastolic}",
+                color = Color.White,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = " mmHg",
+                color = Color(0xFF8B949E),
+                fontSize = 9.sp,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
+
+        Text(
+            text = "${result.category.label} • ${result.heartRate} BPM",
+            color = Color(result.category.colorHex),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Button(
+                onClick = onRemeaure,
+                modifier = Modifier
+                    .height(28.dp)
+                    .width(60.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E293B))
+            ) {
+                Text("Retry", fontSize = 10.sp, color = Color.White)
+            }
+
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .height(28.dp)
+                    .width(60.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF00E676))
+            ) {
+                Text("Done", fontSize = 10.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
 fun WatchHistoryScreen(
     history: List<BloodPressureMeasurement>,
     onClear: () -> Unit,
