@@ -54,32 +54,50 @@ Samsung / Android Phone Companion App
 
 ### 2. Galaxy Watch App (`pulseforge-galaxy-watch-app.apk`)
 
-Install the Wear OS APK onto your Galaxy Watch via **Wireless ADB (Wi-Fi Debugging)** using your computer (PC / Mac / Linux) or a phone-based sideload app (e.g., *Bugjaeger* or *GeminiMan Wear OS Manager*).
+#### 💡 Why is ADB / Sideloading required for Smartwatches?
+Unlike Android phones, **Wear OS (Galaxy Watch) does not have a built-in file manager or package installer UI** that allows tapping an `.apk` file to install it directly on the watch. Google and Samsung intentionally designed Wear OS to install consumer apps exclusively through the Google Play Store.
 
-#### Step-by-Step via Computer (ADB):
+For third-party and open-source applications, **Wireless ADB (Wi-Fi sideloading)** is the standard and official Android developer method to install APKs onto your watch. Once installed, the app runs permanently and natively on the watch.
 
-1. **Enable Developer Options on Galaxy Watch**:
-   - On your Galaxy Watch, go to **Settings** $\to$ **About watch** $\to$ **Software info**.
-   - Tap **Software version** 7 times continuously until you see the notification *"Developer mode turned on"*.
+You can install the watch APK using either your **Android Phone (No PC needed)** or your **Computer**.
 
-2. **Enable Wireless Debugging**:
-   - Go back to **Settings** $\to$ **Developer options**.
-   - Turn **ON** **ADB debugging**.
-   - Turn **ON** **Wireless debugging** (make sure your watch and PC are connected to the same Wi-Fi network).
-   - Note the **IP address and Port** displayed (e.g., `192.168.1.45:5555`).
+---
 
-3. **Connect and Install**:
-   Open your computer terminal and execute:
+#### 📱 Method A: Install from your Phone (Recommended — No PC Needed)
+
+You can use your Android smartphone as the installer using free, graphical Wear OS manager apps:
+
+1. **Install a Sideload App on your Phone**:
+   - Install **[GeminiMan Wear OS Manager](https://play.google.com/store/apps/details?id=com.geminiman.wearosmanager)** (or *Easy Fire Tools* / *Bugjaeger*) from the Google Play Store.
+2. **Download Watch APK on your Phone**:
+   - Download `pulseforge-galaxy-watch-app.apk` from [GitHub Releases](https://github.com/nemke82/pulseforge/releases) directly onto your phone.
+3. **Enable Wireless Debugging on Watch**:
+   - On your Galaxy Watch: **Settings** $\to$ **About watch** $\to$ **Software info** $\to$ tap **Software version** 7 times until Developer mode is enabled.
+   - Go to **Settings** $\to$ **Developer options** $\to$ turn **ON** **ADB debugging** and **Wireless debugging**.
+   - Note the **IP address and Port** shown on the watch screen (ensure watch and phone are on the same Wi-Fi).
+4. **Sideload to Watch**:
+   - Open *GeminiMan Wear OS Manager* on your phone, enter the watch's IP/Port to pair/connect.
+   - Tap **Sideload APK / Install APK File**, select `pulseforge-galaxy-watch-app.apk`, and tap **Install**.
+   - The app will transfer and install onto your Galaxy Watch automatically.
+
+---
+
+#### 💻 Method B: Install via Computer Terminal (ADB)
+
+1. **Enable Wireless Debugging on Watch**:
+   - Go to **Settings** $\to$ **Developer options** on your watch and enable **ADB debugging** + **Wireless debugging**.
+   - Note the IP address and Port (e.g., `192.168.1.45:5555`).
+2. **Connect and Install from Terminal**:
    ```bash
-   # 1. Connect to the watch (replace with your watch's IP address and port)
+   # Connect to watch over Wi-Fi (replace with your watch's IP and port)
    adb connect 192.168.1.45:5555
 
-   # 2. Install the PulseForge Wear OS APK
+   # Install the watch APK
    adb install pulseforge-galaxy-watch-app.apk
    ```
 
-4. **Permissions on Watch**:
-   - Open **PulseForge** on your Galaxy Watch and grant the **Body Sensors** permission when prompted.
+3. **Grant Sensor Permissions**:
+   - Open **PulseForge** on your watch and accept the **Body Sensors** permission prompt.
 
 ---
 
