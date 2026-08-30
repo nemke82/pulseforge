@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseForge — Open-Source Blood Pressure & Sensor Telemetry for Galaxy Watch</title>
+  
+  <meta name="description" content="Open-source Blood Pressure estimation and raw PPG + ECG sensor telemetry suite for Samsung Galaxy Watch (Wear OS 3/4/5/Ultra) and Android Smartphones.">
+  <meta property="og:title" content="PulseForge — Galaxy Watch BP & ECG Telemetry">
+  <meta property="og:description" content="Bypass region locks. Read raw PPG & ECG, calculate Pulse Transit Time, and calibrate personal blood pressure models.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#070B12">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23070B12'/><path d='M15 50 L35 50 L45 20 L55 80 L65 35 L75 50 L85 50' stroke='%2300E676' stroke-width='8' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo">
+        <span class="pulse-dot"></span>
+        <span>PULSEFORGE</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#simulator">Live Simulator</a></li>
+        <li><a href="#science">How It Works</a></li>
+        <li><a href="#install">Install Guide</a></li>
+        <li><a href="https://github.com/nemke82/pulseforge/releases" target="_blank">Releases</a></li>
+      </ul>
+
+      <a href="https://github.com/nemke82/pulseforge" target="_blank" class="nav-btn-gh">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        <span>GitHub</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <div class="badge-tag">
+          <span>✨ CalVer v2026.08.2 Available</span>
+        </div>
+        <h1>Unlock Your Watch's <span class="gradient-text">True Medical Sensors</span></h1>
+        <p class="hero-desc">
+          PulseForge provides direct access to Samsung BioActive PPG & ECG sensors on Galaxy Watch. Compute Pulse Transit Time (PTT), calibrate with reference cuff readings, and get independent Blood Pressure estimations anywhere in the world.
+        </p>
+
+        <div class="cta-group">
+          <a href="https://github.com/nemke82/pulseforge/releases/latest" target="_blank" class="btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download APKs</span>
+          </a>
+
+          <a href="#install" class="btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Sideload Guide</span>
+          </a>
+        </div>
+
+        <div class="compatibility-pill-row">
+          <span class="comp-label">Compatible with:</span>
+          <span class="comp-pill">Galaxy Watch 4 / 5 / 6 / 7</span>
+          <span class="comp-pill">Galaxy Watch Ultra & Ultra 2</span>
+          <span class="comp-pill">Galaxy Watch FE</span>
+          <span class="comp-pill">Android 8.0+</span>
+        </div>
+      </div>
+
+      <div class="mockup-stage">
+        <div class="galaxy-watch-mockup">
+          <div class="pulse-ring-outer"></div>
+          <div class="watch-screen">
+            <span style="font-size: 0.75rem; color: #00E676; font-weight: 800; letter-spacing: 1px;">PULSEFORGE</span>
+            <div class="watch-bp-display">
+              <span id="watchSys" class="watch-bp-sys">120</span>
+              <span class="watch-bp-slash">/</span>
+              <span id="watchDia" class="watch-bp-dia">80</span>
+            </div>
+            <div class="watch-category-badge">OPTIMAL BP</div>
+            <div class="watch-vitals">
+              <span id="watchHr">72 BPM</span>
+              <span>•</span>
+              <span id="watchPtt" style="color: #00B0FF;">210ms PTT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Live Simulator Section -->
+  <section id="simulator" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag">Interactive Telemetry</span>
+        <h2>Live ECG & PPG Oscilloscope Simulator</h2>
+        <p>Adjust Heart Rate & Blood Pressure below to see how Pulse Transit Time (Δt delay between electrical ventricular spike and optical wrist pulse) physically changes in real time.</p>
+      </div>
+
+      <div class="simulator-box">
+        <div class="sim-controls">
+          <div class="control-group">
+            <label>Heart Rate (HR): <span id="hrVal">72 BPM</span></label>
+            <input type="range" id="hrSlider" min="50" max="140" value="72">
+          </div>
+
+          <div class="control-group">
+            <label>Blood Pressure (SYS): <span id="sysVal">120/80 mmHg</span></label>
+            <input type="range" id="sysSlider" min="95" max="175" value="120">
+          </div>
+
+          <div class="ptt-result-metric">
+            <div>
+              <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 700; text-transform: uppercase;">Pulse Transit Time (PTT)</div>
+              <div style="font-size: 0.85rem; color: #00B0FF;">Δt = PPG_foot - ECG_R</div>
+            </div>
+            <div id="pttVal" class="ptt-val">210 ms</div>
+          </div>
+        </div>
+
+        <div class="oscilloscope-canvas-wrapper">
+          <div class="canvas-title-row">
+            <span style="color: #FF5252;">⚡ ECG LEAD (mV) — Ventricular Depolarization</span>
+            <span style="color: #64748B;">50 Hz Telemetry</span>
+          </div>
+          <canvas id="ecgCanvas"></canvas>
+        </div>
+
+        <div class="oscilloscope-canvas-wrapper" style="margin-bottom: 0;">
+          <div class="canvas-title-row">
+            <span style="color: #00E676;">🟢 OPTICAL PPG (Green / IR) — Arterial Pulse Wave</span>
+            <span style="color: #64748B;">BioActive Sensor</span>
+          </div>
+          <canvas id="ppgCanvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag">Engineered for Performance</span>
+        <h2>Built for Accuracy, Privacy & Freedom</h2>
+        <p>Everything you need to monitor, calibrate, and understand your cardiovascular dynamics without cloud dependencies or regional restrictions.</p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🩺</div>
+          <h3>Direct BioActive Telemetry</h3>
+          <p>Bypasses high-level proprietary wrappers to stream raw optical PPG (Green/IR) and ECG electrode voltages directly from Galaxy Watch hardware.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🎯</div>
+          <h3>3-Point Cuff Calibration</h3>
+          <p>Calibrate the mathematical regression formula using your home arm cuff (e.g. Omron). Resolves personalized vascular stiffness coefficients for SYS and DIA.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">📋</div>
+          <h3>Local Watch History</h3>
+          <p>Stores up to 50 recent blood pressure readings directly on watch storage. View trends, heart rate, and classification badges on your wrist even without your phone.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">⏰</div>
+          <h3>Smartwatch Reminders</h3>
+          <p>Configurable vibrating alarms on Galaxy Watch (Every 1h, 2h, 4h, 6h). Tapping the notification immediately wakes the watch and starts a 30s measurement.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🔄</div>
+          <h3>Instant 1-Tap Sync</h3>
+          <p>Bidirectional Google Play Services Wearable Data Layer sync. Push history from your wrist or pull all records to your phone companion app instantly.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🛡️</div>
+          <h3>100% Private & Open-Source</h3>
+          <p>Zero telemetry trackers, zero external cloud servers, and zero telemetry fees. Your health records stay on your devices.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Science & Math Explanation -->
+  <section id="science" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag">The Physiology</span>
+        <h2>Pulse Transit Time (PTT) Explained</h2>
+        <p>How combining simultaneous ECG and Photoplethysmography allows cuffless blood pressure estimation based on arterial wave dynamics.</p>
+      </div>
+
+      <div class="science-flow">
+        <div class="science-step">
+          <span class="step-num">STAGE 01</span>
+          <h4>ECG R-Peak (Heart Spike)</h4>
+          <p>When the heart's ventricles contract, a rapid electrical impulse generates the R-peak in the ECG signal, establishing t_0 ($t_{\text{ECG\_R}}$).</p>
+        </div>
+
+        <div class="science-step">
+          <span class="step-num">STAGE 02</span>
+          <h4>Pulse Wave Propagation</h4>
+          <p>The stroke volume ejects into the aorta, propelling a physical pressure wave through the arterial tree down to the radial artery in the wrist.</p>
+        </div>
+
+        <div class="science-step">
+          <span class="step-num">STAGE 03</span>
+          <h4>Optical PPG Arrival</h4>
+          <p>The watch's optical BioActive LED detects the sudden increase in blood volume (pulse wave foot), giving $t_{\text{PPG\_foot}}$.</p>
+        </div>
+
+        <div class="science-step">
+          <span class="step-num">STAGE 04</span>
+          <h4>Regression Estimation</h4>
+          <p>$\Delta t = t_{\text{PPG}} - t_{\text{ECG}}$. Higher pressure stiffens arterial walls, causing faster waves (shorter $\Delta t$). Calibrated regression calculates SYS and DIA.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Guide Section -->
+  <section id="install" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag">Installation</span>
+        <h2>How to Install on Phone & Galaxy Watch</h2>
+        <p>Choose your preferred installation method below. No computer required if installing from your phone!</p>
+      </div>
+
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tab-phone">📱 Phone App Sideload</button>
+        <button class="tab-btn" data-tab="tab-watch-phone">⌚ Watch via Phone (No PC)</button>
+        <button class="tab-btn" data-tab="tab-watch-pc">💻 Watch via PC (ADB)</button>
+      </div>
+
+      <!-- Tab 1: Phone Sideload -->
+      <div id="tab-phone" class="tab-pane active">
+        <h3>Installing `pulseforge-phone-app.apk` on Android:</h3>
+        <ol style="padding-left: 20px; margin-top: 16px; color: var(--text-secondary); line-height: 1.8;">
+          <li>Download <strong style="color: white;">pulseforge-phone-app.apk</strong> from <a href="https://github.com/nemke82/pulseforge/releases" target="_blank" style="color: var(--neon-green);">GitHub Releases</a> directly on your smartphone.</li>
+          <li>Open the downloaded file in your browser or file manager and tap <strong>Install</strong>.</li>
+          <li>If prompted, enable <em>"Install unknown apps"</em> for your browser.</li>
+          <li>Launch PulseForge and grant Bluetooth and notification permissions.</li>
+        </ol>
+      </div>
+
+      <!-- Tab 2: Watch via Phone Sideload -->
+      <div id="tab-watch-phone" class="tab-pane">
+        <h3>Installing on Galaxy Watch using your Phone (Recommended):</h3>
+        <ol style="padding-left: 20px; margin-top: 16px; color: var(--text-secondary); line-height: 1.8;">
+          <li>Install <strong style="color: white;">GeminiMan Wear OS Manager</strong> or <strong style="color: white;">Easy Fire Tools</strong> from Google Play Store on your phone.</li>
+          <li>Download <strong style="color: white;">pulseforge-galaxy-watch-app.apk</strong> from <a href="https://github.com/nemke82/pulseforge/releases" target="_blank" style="color: var(--neon-green);">GitHub Releases</a> onto your phone.</li>
+          <li>On Galaxy Watch: <strong>Settings &rarr; About watch &rarr; Software info &rarr; Tap "Software version" 7 times</strong> to enable Developer options.</li>
+          <li>Go to <strong>Settings &rarr; Developer options</strong> &rarr; turn ON <strong>ADB debugging</strong> &amp; <strong>Wireless debugging</strong> (watch and phone on same Wi-Fi).</li>
+          <li>In your phone manager app, enter the watch's IP and port, choose <strong>"Sideload APK"</strong>, select the APK, and tap <strong>Install</strong>.</li>
+        </ol>
+      </div>
+
+      <!-- Tab 3: Watch via PC ADB -->
+      <div id="tab-watch-pc" class="tab-pane">
+        <h3>Installing on Galaxy Watch via Computer Terminal (ADB):</h3>
+        <ol style="padding-left: 20px; margin-top: 16px; color: var(--text-secondary); line-height: 1.8;">
+          <li>Enable <strong>Wireless Debugging</strong> in Developer options on your Galaxy Watch.</li>
+          <li>Note the watch IP address &amp; port (e.g. <code>192.168.1.45:5555</code>).</li>
+          <li>Run the following commands in your PC terminal:</li>
+        </ol>
+        
+        <div class="code-box">
+          <button class="copy-btn">Copy</button>
+          <code>adb connect 192.168.1.45:5555<br>adb install pulseforge-galaxy-watch-app.apk</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <a href="#" class="brand-logo">
+          <span class="pulse-dot"></span>
+          <span>PULSEFORGE</span>
+        </a>
+
+        <div style="display: flex; gap: 20px;">
+          <a href="https://github.com/nemke82/pulseforge/releases" target="_blank" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">Releases</a>
+          <a href="https://github.com/nemke82/pulseforge" target="_blank" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">Source Code</a>
+          <a href="https://github.com/nemke82/pulseforge/issues" target="_blank" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">Report Issue</a>
+        </div>
+      </div>
+
+      <div class="footer-disclaimer">
+        ⚠️ <strong>Medical Disclaimer:</strong> PulseForge is an experimental, open-source health telemetry and physiological research project. It is not a certified medical device and should not be used as a substitute for professional clinical medical advice, diagnosis, or treatment.
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
