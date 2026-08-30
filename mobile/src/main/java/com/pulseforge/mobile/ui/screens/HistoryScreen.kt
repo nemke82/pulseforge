@@ -42,9 +42,24 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import com.pulseforge.mobile.datalayer.PhoneDataLayerManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 @Composable
-fun HistoryScreen() {
+fun HistoryScreen(dataLayerManager: PhoneDataLayerManager? = null) {
     val measurements by BloodPressureRepository.measurements.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    var isSyncing by remember { mutableStateOf(false) }
 
     val avgSys = if (measurements.isNotEmpty()) measurements.map { it.systolic }.average().toInt() else 0
     val avgDia = if (measurements.isNotEmpty()) measurements.map { it.diastolic }.average().toInt() else 0
@@ -55,17 +70,46 @@ fun HistoryScreen() {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = "MEASUREMENT HISTORY",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = TextPrimary
-        )
-        Text(
-            text = "${measurements.size} total readings recorded",
-            fontSize = 12.sp,
-            color = TextSecondary
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = "MEASUREMENT HISTORY",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                Text(
+                    text = "${measurements.size} total readings recorded",
+                    fontSize = 12.sp,
+                    color = TextSecondary
+                )
+            }
+
+            if (dataLayerManager != null) {
+                IconButton(
+                    onClick = {
+                        if (!isSyncing) {
+                            coroutineScope.launch {
+                                isSyncing = true
+                                dataLayerManager.requestHistorySync()
+                                delay(1500)
+                                isSyncing = false
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Sync,
+                        contentDescription = "Sync",
+                        tint = if (isSyncing) ElectricBlue else NeonGreen
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 

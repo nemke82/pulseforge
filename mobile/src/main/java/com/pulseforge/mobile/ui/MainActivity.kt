@@ -120,8 +120,8 @@ fun MainApp(dataLayerManager: PhoneDataLayerManager) {
                 )
                 Screen.Signal -> LiveSignalScreen()
                 Screen.Calibration -> CalibrationWizardScreen()
-                Screen.History -> HistoryScreen()
-                Screen.Settings -> SettingsScreen()
+                Screen.History -> HistoryScreen(dataLayerManager = dataLayerManager)
+                Screen.Settings -> SettingsScreen(dataLayerManager = dataLayerManager)
             }
         }
     }

@@ -84,11 +84,15 @@ object DataLayerConstants {
     const val PATH_STOP_MEASUREMENT = "/pulseforge/stop_measurement"
     const val PATH_LIVE_SAMPLE_STREAM = "/pulseforge/live_sample_stream"
     const val PATH_MEASUREMENT_RESULT = "/pulseforge/measurement_result"
+    const val PATH_REQUEST_HISTORY_SYNC = "/pulseforge/request_history_sync"
+    const val PATH_HISTORY_SYNC_RESPONSE = "/pulseforge/history_sync_response"
+    const val PATH_REMINDER_UPDATE = "/pulseforge/reminder_update"
     const val PATH_SYNC_CALIBRATION = "/pulseforge/sync_calibration"
     const val PATH_DEVICE_STATUS = "/pulseforge/device_status"
 
     const val KEY_SAMPLE_PAYLOAD = "key_sample_payload"
     const val KEY_RESULT_PAYLOAD = "key_result_payload"
+    const val KEY_HISTORY_PAYLOAD = "key_history_payload"
     const val KEY_CALIBRATION_PAYLOAD = "key_calibration_payload"
     const val KEY_COMMAND = "key_command"
 }

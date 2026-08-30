@@ -74,4 +74,19 @@ class WearDataSender(private val context: Context) {
             }
         } catch (_: Exception) {}
     }
+
+    suspend fun sendAllHistory(jsonHistory: String): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val nodes = nodeClient.connectedNodes.await()
+            if (nodes.isEmpty()) return@withContext false
+
+            val payload = jsonHistory.toByteArray(Charsets.UTF_8)
+            for (node in nodes) {
+                messageClient.sendMessage(node.id, DataLayerConstants.PATH_HISTORY_SYNC_RESPONSE, payload).await()
+            }
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
 }

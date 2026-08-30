@@ -42,10 +42,19 @@ import com.pulseforge.mobile.ui.theme.TextPrimary
 import com.pulseforge.mobile.ui.theme.TextSecondary
 import com.pulseforge.mobile.ui.theme.WarningOrange
 
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.runtime.rememberCoroutineScope
+import com.pulseforge.mobile.datalayer.PhoneDataLayerManager
+import kotlinx.coroutines.launch
+
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(dataLayerManager: PhoneDataLayerManager? = null) {
     var syncHealthConnect by remember { mutableStateOf(true) }
     var autoMeasureOnWrist by remember { mutableStateOf(false) }
+    var selectedWatchReminder by remember { mutableStateOf(0) }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -59,10 +68,74 @@ fun SettingsScreen() {
             color = TextPrimary
         )
         Text(
-            text = "Device management and health data options",
+            text = "Device management, reminders and health options",
             fontSize = 12.sp,
             color = TextSecondary
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Card: Galaxy Watch Reminders
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = DarkSurface),
+            border = androidx.compose.foundation.BorderStroke(1.dp, BorderColor)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Alarm,
+                        contentDescription = null,
+                        tint = NeonGreen,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Galaxy Watch Reminders",
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary,
+                        fontSize = 14.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Vibrating reminder on your smartwatch to take a Blood Pressure reading",
+                    color = TextMuted,
+                    fontSize = 11.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                val reminderOptions = listOf(0 to "Off", 1 to "1 hr", 2 to "2 hrs", 4 to "4 hrs", 6 to "6 hrs")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    reminderOptions.forEach { (hours, label) ->
+                        val isSelected = selectedWatchReminder == hours
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                selectedWatchReminder = hours
+                                dataLayerManager?.let { mgr ->
+                                    coroutineScope.launch {
+                                        mgr.sendReminderSettingsToWatch(hours)
+                                    }
+                                }
+                            },
+                            label = { Text(label, fontSize = 11.sp) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = NeonGreen,
+                                selectedLabelColor = Color.Black,
+                                containerColor = Color(0xFF1B2438),
+                                labelColor = TextPrimary
+                            )
+                        )
+                    }
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 

@@ -73,6 +73,8 @@ fun DashboardScreen(
     val calibrationProfile by BloodPressureRepository.calibrationProfile.collectAsState()
     val latest = measurements.firstOrNull()
     val coroutineScope = rememberCoroutineScope()
+    var isSyncing by remember { mutableStateOf(false) }
+    var syncStatusText by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -101,30 +103,43 @@ fun DashboardScreen(
                 )
             }
 
-            // Watch connection badge
+            // Watch connection & Sync badge
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
                     .background(DarkSurfaceElevated)
+                    .clickable {
+                        if (!isSyncing) {
+                            coroutineScope.launch {
+                                isSyncing = true
+                                syncStatusText = "Syncing..."
+                                val success = dataLayerManager.requestHistorySync()
+                                syncStatusText = if (success) "Synced!" else "Watch offline"
+                                delay(2000)
+                                isSyncing = false
+                                syncStatusText = null
+                            }
+                        }
+                    }
                     .padding(horizontal = 10.dp, vertical = 6.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(NeonGreen)
+                        .background(if (isSyncing) ElectricBlue else NeonGreen)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Icon(
-                    imageVector = Icons.Default.Watch,
+                    imageVector = if (isSyncing) Icons.Default.Refresh else Icons.Default.Watch,
                     contentDescription = null,
                     tint = TextPrimary,
                     modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Galaxy Watch",
+                    text = syncStatusText ?: "Sync Watch",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = TextPrimary

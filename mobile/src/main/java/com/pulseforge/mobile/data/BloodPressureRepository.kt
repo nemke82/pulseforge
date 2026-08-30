@@ -54,8 +54,18 @@ object BloodPressureRepository {
 
     fun addMeasurement(measurement: BloodPressureMeasurement) {
         val current = _measurements.value.toMutableList()
-        current.add(0, measurement)
-        _measurements.value = current
+        if (current.none { it.id == measurement.id || it.timestampMs == measurement.timestampMs }) {
+            current.add(0, measurement)
+            _measurements.value = current.sortedByDescending { it.timestampMs }
+        }
+    }
+
+    fun mergeHistory(newItems: List<BloodPressureMeasurement>) {
+        val currentMap = _measurements.value.associateBy { it.id }.toMutableMap()
+        for (item in newItems) {
+            currentMap[item.id] = item
+        }
+        _measurements.value = currentMap.values.sortedByDescending { it.timestampMs }
     }
 
     fun addCalibrationPoint(point: CalibrationPoint) {

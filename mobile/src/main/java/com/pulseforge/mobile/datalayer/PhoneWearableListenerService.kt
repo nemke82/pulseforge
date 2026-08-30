@@ -45,6 +45,28 @@ class PhoneWearableListenerService : WearableListenerService() {
                     BloodPressureRepository.addMeasurement(measurement)
                 } catch (_: Exception) {}
             }
+            DataLayerConstants.PATH_HISTORY_SYNC_RESPONSE -> {
+                try {
+                    val jsonStr = String(messageEvent.data, Charsets.UTF_8)
+                    val jsonArray = org.json.JSONArray(jsonStr)
+                    val list = mutableListOf<BloodPressureMeasurement>()
+                    for (i in 0 until jsonArray.length()) {
+                        val obj = jsonArray.getJSONObject(i)
+                        list.add(
+                            BloodPressureMeasurement(
+                                id = obj.optString("id", java.util.UUID.randomUUID().toString()),
+                                timestampMs = obj.optLong("timestamp", System.currentTimeMillis()),
+                                systolic = obj.optInt("sys", 120),
+                                diastolic = obj.optInt("dia", 80),
+                                heartRate = obj.optInt("hr", 70),
+                                pttMs = obj.optDouble("ptt", 220.0),
+                                confidence = obj.optDouble("confidence", 0.9).toFloat()
+                            )
+                        )
+                    }
+                    BloodPressureRepository.mergeHistory(list)
+                } catch (_: Exception) {}
+            }
         }
     }
 
