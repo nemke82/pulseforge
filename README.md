@@ -1,115 +1,130 @@
 # 🩺 PulseForge (GalaxyBP)
 
-**PulseForge** is an open-source health telemetry and Blood Pressure estimation suite designed specifically for **Samsung Galaxy Watch 4 / 5 / 6 / 7 (Wear OS)** and **Android / Samsung Phones**.
+**PulseForge** je open-source sistem za telemetriju zdravstvenih senzora i procenu krvnog pritiska namenjen za **Samsung Galaxy Watch 4 / 5 / 6 / 7 (Wear OS)** i **Android / Samsung telefone**.
 
-It bypasses region/country restrictions of proprietary apps by directly accessing raw sensor channels (**Optical PPG + ECG + Heart Rate**) to compute **Pulse Transit Time (PTT)** and estimate systolic/diastolic blood pressure (**SYS / DIA**) calibrated against reference cuff readings (e.g. Omron).
+Aplikacija zaobilazi regionalna ograničenja fabričkih aplikacija direktnim pristupom sirovim hardverskim kanalima sata (**Optički PPG + ECG elektrode + Puls**) kako bi izračunala **Pulse Transit Time (PTT)** i procenila sistolni/dijastolni pritisak (**SYS / DIA**) kalibrisan pomoću pravog aparata sa manžetnom (npr. Omron).
 
 ---
 
-## 📐 How It Works
+## 📅 CalVer Verzije i GitHub Releases
+
+Projekat koristi **[Calendar Versioning (CalVer)](https://calver.org/)** šemu:
+$$\mathbf{vYYYY.0M.MICRO} \quad \text{(primer: } \mathbf{v2026.08.1}\text{)}$$
+
+Svaki put kada se u repozitorijum pošalje tag (npr. `v2026.08.1`), GitHub Actions automatski gradi i objavljuje novi **GitHub Release** sa priloženim APK paketima spremnim za preuzimanje:
+
+👉 **[Preuzmi najnoviji Release (GitHub Releases)](https://github.com/nemke82/pulseforge/releases)**
+
+---
+
+## 📐 Kako sistem funkcioniše
 
 ```
 Galaxy Watch (Wear OS)
         │
-        ├── Samsung PPG (Green / IR Photoplethysmogram)
-        ├── ECG Electrodes (mV QRS complex)
-        └── Heart Rate & IBI
+        ├── Samsung PPG (Zeleni / Infracrveni optički senzor)
+        ├── ECG elektrode (mV QRS impuls komora)
+        └── Heart Rate & IBI (Puls)
         │
         ▼ (Bluetooth Wearable Data Layer)
-Samsung Phone Companion App
+Samsung Phone Companion Aplikacija
         │
-        ├── Real-time Oscilloscope Waveforms
-        ├── 3-Point Omron Cuff Calibration (SYS = a·PTT + b·HR + c)
-        ├── Dynamic SYS / DIA Estimation
-        └── Health Connect & Measurement History
+        ├── Osciloskop uživo za PPG i ECG talase
+        ├── 3-Point Kalibracija manžetnom (SYS = a·PTT + b·HR + c)
+        ├── Matematička procena SYS / DIA
+        └── Istorija merenja i Health Connect sinhronizacija
 ```
 
-### Pulse Transit Time (PTT) Math
-1. **ECG R-Peak**: Identifies ventricular depolarization ($t_{ECG\_R}$).
-2. **PPG Pulse Arrival**: Detects the systolic wave foot ($t_{PPG\_foot}$).
-3. **PTT ($\Delta t$)**: $\Delta t = t_{PPG\_foot} - t_{ECG\_R}$.
-4. **Blood Pressure Model**: As vascular tone and blood pressure increase, pulse waves travel faster (PTT decreases). Using a 3-point cuff calibration, a personalized regression model translates $(PTT, HR) \to (SYS, DIA)$.
+### Princip Pulse Transit Time (PTT) metode:
+1. **ECG R-pik ($t_{\text{ECG\_R}}$)**: Beleži trenutak električne depolarizacije srčanih komora.
+2. **PPG dolazak pulsa ($t_{\text{PPG\_foot}}$)**: Optički senzor na zglobu beleži trenutak nailaska talasa krvi.
+3. **PTT ($\Delta t$)**: Razlika $\Delta t = t_{\text{PPG\_foot}} - t_{\text{ECG\_R}}$.
+4. **Model pritiska**: Kada je krvni pritisak viši, arterije su zategnutije i pulsni talas putuje brže ($\Delta t$ opada). Kalibracijom pomoću 3 merenja manžetnom dobija se personalizovana regresiona formula.
 
 ---
 
-## 🚀 Automated APK Builds via GitHub Actions
+## 📲 Uputstvo za Instalaciju
 
-This repository includes a preconfigured GitHub Actions workflow [`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml) that builds APKs automatically.
-
-### 📥 Downloading the APKs
-1. Go to the **Actions** tab on your GitHub repository: `https://github.com/nemke82/pulseforge/actions`
-2. Click on the latest workflow run.
-3. Scroll down to **Artifacts** to download:
-   - `pulseforge-phone-app`: APK for your Android / Samsung smartphone.
-   - `pulseforge-galaxy-watch-app`: APK for your Galaxy Watch (Wear OS).
-   - `pulseforge-apks-bundle`: ZIP containing both APKs.
+### 1. Instalacija na Android Telefon (`pulseforge-phone-app.apk`)
+1. Preuzmi `pulseforge-phone-app.apk` iz [Releases](https://github.com/nemke82/pulseforge/releases).
+2. Otvori preuzeti APK fajl na telefonu i klikni **Install** (ako pita, dozvoli *"Install unknown apps"*).
+3. Pokreni aplikaciju i odobri Bluetooth i Permission dozvole.
 
 ---
 
-## 📲 Installation Guide
+### 2. Instalacija na Galaxy Watch (`pulseforge-galaxy-watch-app.apk`)
 
-### 1. Phone App (`pulseforge-phone-app.apk`)
-- Transfer `pulseforge-phone-app.apk` to your phone or download directly from GitHub.
-- Open the APK on your phone and tap **Install** (allow "Install unknown apps" if prompted).
+Galaxy Watch koristi Wear OS, pa se APK instalira putem **Wireless ADB (bežični debugging)** direktno sa računara ili sa telefona (koristeći aplikaciju *Bugjaeger* ili *GeminiMan Wear OS Manager*).
 
----
+#### Korak po korak preko računara (PC / Mac / Linux):
 
-### 2. Galaxy Watch App (`pulseforge-galaxy-watch-app.apk`)
+1. **Aktiviraj Developer Options na satu**:
+   - Na Galaxy Watch-u otvori **Settings** $\to$ **About watch** $\to$ **Software info**.
+   - Dodirni polje **Software version** 7 puta uzastopno dok se ne pojavi poruka *"Developer mode turned on"*.
 
-Install the Wear OS APK directly onto your Galaxy Watch via **Wireless ADB**:
+2. **Uključi Wireless Debugging na satu**:
+   - Vrati se u **Settings** $\to$ **Developer options**.
+   - Uključi **ADB debugging**.
+   - Uključi **Wireless debugging** (sat i računar moraju biti na istoj Wi-Fi mreži).
+   - Obrati pažnju na prikazanu **IP adresu i port** (npr. `192.168.1.45:5555` ili port za uparivanje).
 
-1. **Enable Developer Options on Galaxy Watch**:
-   - On your Galaxy Watch, go to **Settings** $\to$ **About watch** $\to$ **Software info**.
-   - Tap **Software version** 7 times until you see *"Developer mode turned on"*.
-2. **Enable Wireless Debugging**:
-   - Go back to **Settings** $\to$ **Developer options**.
-   - Turn **ON** **ADB debugging** and **Wireless debugging**.
-   - Note the **IP address and port** shown (e.g. `192.168.1.50:5555` or pairing port on Wear OS 4/5).
-3. **Connect and Install from your PC / Terminal**:
+3. **Poveži se i instaliraj aplikaciju**:
+   Otvori terminal na računaru i pokreni:
    ```bash
-   # Connect to watch
-   adb connect 192.168.1.50:5555
+   # 1. Povezivanje sa satom (zameni sa IP adresom tvog sata)
+   adb connect 192.168.1.45:5555
 
-   # Install the Wear APK
+   # 2. Instalacija PulseForge Wear aplikacije
    adb install pulseforge-galaxy-watch-app.apk
    ```
 
----
-
-## 🎯 3-Point Cuff Calibration Protocol
-
-For optimal accuracy:
-1. **Rest**: Sit quietly for 5 minutes with feet flat on the floor.
-2. **First Point**: Take a simultaneous reading with your arm cuff (e.g. Omron) and the Galaxy Watch. Enter the cuff SYS/DIA into the **Calibration Wizard** in the phone app.
-3. **Second Point**: Repeat 15–20 minutes later.
-4. **Third Point**: Take a third measurement at a different time of day or after mild activity (to capture dynamic pressure variance).
-5. Once 3 points are saved, your custom mathematical calibration profile will automatically be applied to all future watch readings.
+4. **Dozvole na satu**:
+   - Pokreni **PulseForge** na satu i odobri dozvolu za senzore tela (**Body Sensors**).
 
 ---
 
-## 🛠 Project Structure
+## 🧪 Protokol za Testiranje (Korak po Korak)
 
-```
-pulseforge/
-├── .github/workflows/
-│   └── build-apk.yml           # GitHub Actions CI/CD workflow
-├── shared/                     # Shared models, PTT algorithm, regression solver
-│   └── src/main/java/com/pulseforge/shared/
-│       ├── algorithm/          # PttBpEstimator (peak detection, calibration math)
-│       └── model/              # SensorSample, BloodPressureMeasurement, CalibrationProfile
-├── mobile/                     # Android Phone Companion App (Jetpack Compose Material 3)
-│   └── src/main/java/com/pulseforge/mobile/
-│       ├── datalayer/          # Wearable Data Layer receiver service
-│       ├── data/               # Repository and history state management
-│       └── ui/                 # Dashboard, Live Signal, Calibration, History, Settings
-└── wear/                       # Galaxy Watch Wear OS App (Wear Compose)
-    └── src/main/java/com/pulseforge/wear/
-        ├── datalayer/          # Data Layer stream sender
-        ├── sensor/             # Samsung PPG/ECG & Heart Rate SensorManager
-        └── presentation/       # Circular UI, animated pulse wave, countdown
-```
+Kada su obe aplikacije instalirane, isprati sledeći postupak za kompletno testiranje:
+
+### Faza 1: Provera Bluetooth veze
+1. Otvori **PulseForge** na telefonu.
+2. Na početnom ekranu (**Dashboard**) u gornjem desnom uglu proveri da li stoji zeleni bedž **`Galaxy Watch (Connected)`**.
+3. Otvori aplikaciju na satu — status treba da prikaže **`Phone Paired`**.
+
+### Faza 2: Testiranje prenosa signala uživo (Live Oscilloscope)
+1. U aplikaciji na telefonu pređi na tab **`Signal`**.
+2. Na satu dodirni dugme **`START BP & ECG`** i prisloni prst druge ruke na gornje dugme/elektrodu sata.
+3. Na telefonu posmatraj:
+   - Zeleni talas: **Optički PPG signal pulsa**.
+   - Crveni talas: **ECG električni impuls**.
+   - Prikaz **Pulse Transit Time ($\Delta t$)** u milisekundama.
+
+### Faza 3: Personalizovana 3-Point Kalibracija (sa Omron manžetnom)
+Za tačne rezultate potrebno je izvršiti 3 kalibraciona merenja:
+1. U aplikaciji na telefonu otvori tab **`Calibrate`**.
+2. Sedite mirno 5 minuta.
+3. Izmeri pritisak pravim aparatom na nadlaktici (npr. Omron) i istovremeno pokreni merenje na satu.
+4. Upiši dobijene vrednosti (npr. `122` za SYS i `81` za DIA) u formu i klikni **`Save Calibration Point`**.
+5. Ponovi postupak još dva puta u toku dana (npr. nakon pauze ili lagane šetnje kako bi postojala prirodna varijacija pritiska).
+6. Nakon 3. tačke profil prelazi u status **`CALIBRATED PROFILE ACTIVE`**.
+
+### Faza 4: Redovno merenje i istorija
+1. Pokreni merenje pritiskom na dugme na satu ili tapom na **`START WATCH MEASUREMENT`** sa telefona.
+2. Merenje traje 30 sekundi.
+3. Po završetku, sat vibrira i prikazuje procenjeni **SYS / DIA** i puls.
+4. Rezultat se automatski sinhronizuje u tab **`History`** na telefonu sa grafikonom i statistikom.
 
 ---
 
-## ⚠️ Disclaimer
-*PulseForge is an experimental research and personal health telemetry tool. It is not a certified medical device and should not be used as a substitute for professional medical diagnosis or clinical treatment.*
+## 🛠 Tehnologije
+
+- **Wear OS Module**: Jetpack Compose for Wear OS, Android SensorManager, Samsung Health Sensors raw PPG/ECG, Play Services Wearable.
+- **Mobile Module**: Jetpack Compose Material 3, Dark Mode Cyber-Medical dizajn, Custom Canvas Oscilloscope, StateFlow.
+- **Shared Module**: Digital Signal Processing (DSP), Pan-Tompkins R-peak algoritam, linearna i nelinearna regresija.
+- **CI/CD**: GitHub Actions sa automatskim generisanjem i potpisivanjem APK fajlova i objavljivanjem GitHub Releases.
+
+---
+
+## ⚠️ Napomena i Odricanje Odgovornosti
+*PulseForge je eksperimentalni projekat namenjen za istraživanje i ličnu telemetriju zdravstvenih senzora. Nije sertifikovano medicinsko sredstvo i ne sme se koristiti za postavljanje medicinske dijagnoze ili određivanje terapije.*
