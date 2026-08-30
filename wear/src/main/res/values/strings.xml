@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PulseForge Wear</string>
+    <string name="measure_bp">Measure BP</string>
+    <string name="measuring">Measuring…</string>
+    <string name="hold_still">Keep still and touch upper electrode if testing ECG</string>
+    <string name="connected_phone">Connected to Phone</string>
+    <string name="standalone_mode">Standalone Watch Mode</string>
+</resources>

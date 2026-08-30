@@ -1,0 +1,46 @@
+package com.pulseforge.mobile.datalayer
+
+import android.content.Context
+import com.google.android.gms.wearable.Wearable
+import com.pulseforge.shared.model.DataLayerConstants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+
+class PhoneDataLayerManager(private val context: Context) {
+
+    private val messageClient = Wearable.getMessageClient(context)
+    private val nodeClient = Wearable.getNodeClient(context)
+
+    suspend fun isGalaxyWatchConnected(): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val nodes = nodeClient.connectedNodes.await()
+            nodes.isNotEmpty()
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    suspend fun getConnectedNodeName(): String? = withContext(Dispatchers.IO) {
+        try {
+            val nodes = nodeClient.connectedNodes.await()
+            nodes.firstOrNull()?.displayName
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    suspend fun triggerWatchMeasurement() = withContext(Dispatchers.IO) {
+        try {
+            val nodes = nodeClient.connectedNodes.await()
+            val json = JSONObject().apply {
+                put("cmd", "START")
+            }.toString().toByteArray(Charsets.UTF_8)
+
+            for (node in nodes) {
+                messageClient.sendMessage(node.id, DataLayerConstants.PATH_START_MEASUREMENT, json).await()
+            }
+        } catch (_: Exception) {}
+    }
+}

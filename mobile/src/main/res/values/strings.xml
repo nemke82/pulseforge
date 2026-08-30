@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PulseForge BP</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_signal">Live Signal</string>
+    <string name="nav_calibration">Calibration</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+</resources>

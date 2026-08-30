@@ -1,0 +1,109 @@
+name: Build PulseForge APKs (Phone + Galaxy Watch)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type (debug or release)'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+
+jobs:
+  build:
+    name: Build Android & Wear OS APKs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew test --stacktrace
+
+      - name: Build Debug APKs
+        if: "${{ github.event.inputs.build_type != 'release' }}"
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Build Release APKs
+        if: "${{ github.event.inputs.build_type == 'release' || startsWith(github.ref, 'refs/tags/v') }}"
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Prepare APK Artifacts
+        run: |
+          mkdir -p artifacts
+          
+          # Find and copy Mobile Phone APK
+          MOBILE_APK=$(find mobile/build/outputs/apk/ -name "*.apk" | head -n 1)
+          if [ -f "$MOBILE_APK" ]; then
+            cp "$MOBILE_APK" artifacts/pulseforge-phone-app.apk
+            echo "Copied Mobile APK: $MOBILE_APK -> artifacts/pulseforge-phone-app.apk"
+          fi
+          
+          # Find and copy Wear OS Watch APK
+          WEAR_APK=$(find wear/build/outputs/apk/ -name "*.apk" | head -n 1)
+          if [ -f "$WEAR_APK" ]; then
+            cp "$WEAR_APK" artifacts/pulseforge-galaxy-watch-app.apk
+            echo "Copied Wear APK: $WEAR_APK -> artifacts/pulseforge-galaxy-watch-app.apk"
+          fi
+          
+          ls -la artifacts/
+
+      - name: Upload Phone App APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulseforge-phone-app
+          path: artifacts/pulseforge-phone-app.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Galaxy Watch App APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulseforge-galaxy-watch-app
+          path: artifacts/pulseforge-galaxy-watch-app.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Combined APKs Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulseforge-apks-bundle
+          path: artifacts/*.apk
+          retention-days: 30
+
+      - name: Create GitHub Release on Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.apk
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
