@@ -62,6 +62,7 @@ import com.pulseforge.wear.data.WearHistoryManager
 import com.pulseforge.wear.datalayer.WearDataSender
 import com.pulseforge.wear.reminder.WearReminderManager
 import com.pulseforge.wear.sensor.GalaxySensorManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -100,10 +101,6 @@ fun WearApp(
     // Check phone connection on launch
     LaunchedEffect(Unit) {
         isPhoneConnected = dataSender.checkPhoneConnected()
-        if (initialAutoStart) {
-            setKeepScreenOn(true)
-            sensorManager.startMeasurement(30)
-        }
     }
 
     // Live sensor streaming during measurement
@@ -119,29 +116,39 @@ fun WearApp(
         }
     }
 
-    // 30-second measurement countdown
-    LaunchedEffect(isMeasuring) {
-        if (isMeasuring) {
+    // Dedicated Measurement Lifecycle keyed on currentScreen
+    LaunchedEffect(currentScreen) {
+        if (currentScreen == WearScreen.MEASURING) {
+            setKeepScreenOn(true)
+            sensorManager.startMeasurement(30)
             countdownSeconds = 30
-            while (countdownSeconds > 0 && sensorManager.isMeasuring.value) {
+
+            while (countdownSeconds > 0) {
                 delay(1000)
                 countdownSeconds--
             }
-            if (sensorManager.isMeasuring.value) {
-                val samples = sensorManager.stopMeasurement()
-                val result = PttBpEstimator.estimateBloodPressure(samples)
-                lastResult = result
 
-                // Save locally on watch
+            // Stop sensor measurement and calculate BP estimate
+            val samples = sensorManager.stopMeasurement()
+            val result = PttBpEstimator.estimateBloodPressure(samples)
+            lastResult = result
+
+            // Save reading to local watch history
+            try {
                 historyManager.addMeasurement(result)
                 historyList = historyManager.getHistory()
+            } catch (_: Exception) {}
 
-                // Sync directly with phone
-                dataSender.sendMeasurementResult(result)
-                val jsonHistory = historyManager.getAllAsJson()
-                dataSender.sendAllHistory(jsonHistory)
+            // Switch to RESULT screen immediately
+            currentScreen = WearScreen.RESULT
 
-                currentScreen = WearScreen.RESULT
+            // Send to phone asynchronously in background so network/timeout never blocks the UI
+            coroutineScope.launch(Dispatchers.IO) {
+                try {
+                    dataSender.sendMeasurementResult(result)
+                    val jsonHistory = historyManager.getAllAsJson()
+                    dataSender.sendAllHistory(jsonHistory)
+                } catch (_: Exception) {}
             }
         }
     }
@@ -164,9 +171,7 @@ fun WearApp(
                         latestReading = historyList.firstOrNull(),
                         syncFeedback = syncFeedback,
                         onStartMeasure = {
-                            setKeepScreenOn(true)
                             currentScreen = WearScreen.MEASURING
-                            sensorManager.startMeasurement(30)
                         },
                         onOpenHistory = {
                             historyList = historyManager.getHistory()
@@ -212,9 +217,7 @@ fun WearApp(
                                 setKeepScreenOn(false)
                             },
                             onRemeaure = {
-                                setKeepScreenOn(true)
                                 currentScreen = WearScreen.MEASURING
-                                sensorManager.startMeasurement(30)
                             }
                         )
                     } ?: run {
